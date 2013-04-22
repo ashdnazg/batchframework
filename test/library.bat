@@ -1,6 +1,8 @@
-@ECHO off
+::@ECHO off
 :Start
 CALL :%*
+GOTO :EOF
+:Init
 GOTO :EOF
 
 :Func1
