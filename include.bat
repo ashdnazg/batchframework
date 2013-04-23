@@ -11,7 +11,7 @@ GOTO :EOF
 
 :ProcessLine
 SET "include.processline.LINE=%~1"
-IF %include.processline.LINE:~,1%_==:_ (
+IF "%include.processline.LINE:~,1%"==":" (
     IF "%include.processline.LINE:~1,1%" NEQ ":" (
         CALL SET "%include.LIBNAME%.%include.processline.LINE:~1%=CALL %include.LIBNAME% %include.processline.LINE:~1%"
     )
