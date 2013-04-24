@@ -1,8 +1,8 @@
 ::@ECHO off
 
 :Start
+CALL %~1 Init
 SET "include.LIBNAME=%~1"
-CALL %include.LIBNAME% Init
 
 FOR /F %%A IN (%~1.bat) DO (
     CALL :ProcessLine "%%A"

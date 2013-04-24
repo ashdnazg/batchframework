@@ -27,7 +27,7 @@ SET @text.StrLen=FOR %%n IN (1 2) DO IF %%n==2 (%text.NL%
              SET /a "len|=1<<%%A"%text.NL%
              FOR %%B IN (!len!) DO IF "!str:~%%B,1!"=="" SET /a "len&=~1<<%%A"%text.NL%
            )%text.NL%
-           FOR %%v IN (!len!) DO ENDLOCAL^&IF "%%~B" neq "" (SET "%%~1=%%v")%text.NL%
+           FOR %%v IN (!len!) DO ENDLOCAL^&IF "%%~B" NEQ "" (SET "%%~1=%%v")%text.NL%
       ) %text.NL%
 ) ELSE SETLOCAL enableDelayedExpansion ^& SET argv=,
 
