@@ -40,6 +40,35 @@ SET @list.GetAll=FOR %%n IN (1 2) DO IF %%n==2 (%text.NL%
          FOR /F "delims=" %%I in ("!ALLITEMS!") DO ENDLOCAL^&(SET %%~2=%%I)%text.NL%
       ) %text.NL%
 ) ELSE SETLOCAL enableDelayedExpansion ^& SET argv=,
+
+
+SET @list.New=FOR %%n IN (1 2) DO IF %%n==2 (%text.NL%
+    FOR /F "tokens=1 delims=, " %%1 IN ("!argv!") DO (%text.NL%
+        ENDLOCAL^&(%text.NL%
+        SET %%~1.HEAD.NEXT=NONE%text.NL%
+        SET %%~1.HEAD.VALUE=NONE%text.NL%
+        SET %%~1.LEN=0%text.NL%
+        SET %%~1.ID=0%text.NL%
+        )%text.NL%
+    ) %text.NL%
+) ELSE SETLOCAL enableDelayedExpansion ^& SET argv=,
+
+SET @list.Add=FOR %%n IN (1 2) DO IF %%n==2 (%text.NL%
+    FOR /F "tokens=1,2 delims=, " %%1 IN ("!argv!") DO (%text.NL%
+        SET CURITEM=%%~1.HEAD%text.NL%
+        FOR /L %%O IN (1,1,!%%~1.LEN!) DO FOR %%C IN (!CURITEM!) DO SET CURITEM=!%%C.NEXT!%text.NL%
+        SET NEWNODE=%%~1_!%%~1.ID!%text.NL%
+        FOR %%O IN (!NEWNODE!) DO FOR %%C IN (!CURITEM!) DO ENDLOCAL^&(%text.NL%
+        SET %%C.NEXT=%%O%text.NL%
+        SET %%O.PREV=%%C%text.NL%
+        SET %%O.VALUE=%%~2%text.NL%
+        SET %%O.NEXT=NONE%text.NL%
+        SET /A %%~1.ID=%%~1.ID + 1%text.NL%
+        SET /A %%~1.LEN=%%~1.LEN + 1%text.NL%
+        )%text.NL%
+    ) %text.NL%
+) ELSE SETLOCAL enableDelayedExpansion ^& SET argv=,
+
 EXIT /b
 
 :New <out_list>

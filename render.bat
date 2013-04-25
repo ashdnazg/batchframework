@@ -5,13 +5,11 @@ EXIT /b
 :Init
 CALL INCLUDE text
 CALL INCLUDE list
-IF "%RENDERER%" NEQ "1" (
-    SET RENDERER=1
-    %list.New% RENDERER.OBJECTS
-    SET RENDERER.HEIGHT=20
-    SET RENDERER.WIDTH=50
-    SET "RENDERER.BLANKROW=                                                  "
-)
+SET RENDERER=1
+%@list.New% RENDERER.OBJECTS
+SET RENDERER.HEIGHT=22
+SET RENDERER.WIDTH=50
+SET "RENDERER.BLANKROW=                                                  "
 EXIT /b
 
 :Sprite <out_sprite> <file>
@@ -44,7 +42,7 @@ SET %~1.HEIGHT=%~3
 SET %~1.WIDTH=%~4
 SET %~1.ROW=%~5
 SET %~1.COL=%~6
-%list.Add% RENDERER.OBJECTS %~1
+%@list.Add% RENDERER.OBJECTS %~1
 EXIT /b
 
 :Render <file>
@@ -58,8 +56,22 @@ FOR /L %%R in (0,1,%RENDERER.HEIGHT%) DO (
         FOR %%S in (!SPRITE!) DO (SET SPRITEROWS=!%%S.ROWS!)
         IF !Y! GEQ 0 IF !SPRITEROWS! GTR !Y! FOR %%S in (!SPRITE!) DO FOR %%Y in (!Y!) DO (
             SET /A BEFORE=!%%S[%%Y].START! + !%%O.COL!
-            SET /A AFTER=!BEFORE!+!%%S[%%Y].LEN!
-            FOR %%B IN (!BEFORE!) DO FOR %%A IN (!AFTER!) DO SET "TEMPROW=!TEMPROW:~0,%%B!!%%S[%%Y]!!TEMPROW:~%%A!"
+            IF !BEFORE! GEQ 0 (
+                SET START=0
+                SET /A AFTER=!BEFORE!+!%%S[%%Y].LEN!
+                IF !AFTER! GTR %RENDERER.WIDTH% (
+                    SET /A LEN=%RENDERER.WIDTH%-!BEFORE!
+                    IF 0 GTR !LEN! SET LEN=0
+                    SET AFTER=%RENDERER.WIDTH%
+                ) ELSE SET LEN=!%%S[%%Y].LEN!
+            ) ELSE (
+                SET /A START=0 - !BEFORE!
+                SET /A BEFORE=0
+                SET /A LEN=!%%S[%%Y].LEN!-!START!
+                IF 0 GTR !LEN! SET LEN=0
+                SET /A AFTER=!BEFORE!+!LEN!
+            )
+            FOR %%B IN (!BEFORE!) DO FOR %%A IN (!AFTER!) DO FOR %%T IN (!START!) DO FOR %%L IN (!LEN!) DO SET "TEMPROW=!TEMPROW:~0,%%B!!%%S[%%Y]:~%%T,%%L!!!TEMPROW:~%%A!" >> tmp.tmp
         )
     )
     ECHO.!TEMPROW!
