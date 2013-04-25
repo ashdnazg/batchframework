@@ -45,12 +45,11 @@ SET %~1.COL=%~6
 %@list.Add% RENDERER.OBJECTS %~1
 EXIT /b
 
-:Render <file>
-%@list.GetAll% RENDERER.OBJECTS OBJS
+:Render <objects>
 SETLOCAL EnableDelayedExpansion
 FOR /L %%R in (0,1,%RENDERER.HEIGHT%) DO (
     SET "TEMPROW=%RENDERER.BLANKROW%
-    FOR %%O in (%OBJS%) DO (
+    FOR %%O in (!%1!) DO (
         SET /A Y=%%R - !%%O.ROW!
         SET SPRITE=!%%O.SPRITE!
         FOR %%S in (!SPRITE!) DO (SET SPRITEROWS=!%%S.ROWS!)
@@ -76,7 +75,7 @@ FOR /L %%R in (0,1,%RENDERER.HEIGHT%) DO (
                     SET AFTER=%RENDERER.WIDTH%
                 ) ELSE SET LEN=!%%S[%%Y].LEN!
             )
-            FOR %%B IN (!BEFORE!) DO FOR %%A IN (!AFTER!) DO FOR %%T IN (!START!) DO FOR %%L IN (!LEN!) DO SET "TEMPROW=!TEMPROW:~0,%%B!!%%S[%%Y]:~%%T,%%L!!!TEMPROW:~%%A!" >> tmp.tmp
+            FOR %%B IN (!BEFORE!) DO FOR %%A IN (!AFTER!) DO FOR %%T IN (!START!) DO FOR %%L IN (!LEN!) DO SET "TEMPROW=!TEMPROW:~0,%%B!!%%S[%%Y]:~%%T,%%L!!!TEMPROW:~%%A!"
         )
     )
     ECHO.!TEMPROW!
