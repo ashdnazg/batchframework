@@ -59,16 +59,52 @@ SET @list.Add=FOR %%n IN (1 2) DO IF %%n==2 (%text.NL%
         FOR /L %%O IN (1,1,!%%~1.LEN!) DO FOR %%C IN (!CURITEM!) DO SET CURITEM=!%%C.NEXT!%text.NL%
         SET NEWNODE=%%~1_!%%~1.ID!%text.NL%
         FOR %%O IN (!NEWNODE!) DO FOR %%C IN (!CURITEM!) DO ENDLOCAL^&(%text.NL%
-        SET %%C.NEXT=%%O%text.NL%
-        SET %%O.PREV=%%C%text.NL%
-        SET %%O.VALUE=%%~2%text.NL%
-        SET %%O.NEXT=NONE%text.NL%
-        SET /A %%~1.ID=%%~1.ID + 1%text.NL%
-        SET /A %%~1.LEN=%%~1.LEN + 1%text.NL%
+            SET %%C.NEXT=%%O%text.NL%
+            SET %%O.PREV=%%C%text.NL%
+            SET %%O.VALUE=%%~2%text.NL%
+            SET %%O.NEXT=NONE%text.NL%
+            SET /A %%~1.ID=%%~1.ID + 1%text.NL%
+            SET /A %%~1.LEN=%%~1.LEN + 1%text.NL%
         )%text.NL%
     ) %text.NL%
 ) ELSE SETLOCAL enableDelayedExpansion ^& SET argv=,
 
+SET @list.IndexOf=FOR %%n IN (1 2) DO IF %%n==2 (%text.NL%
+    FOR /F "tokens=1,2,3 delims=, " %%1 IN ("!argv!") DO (%text.NL%
+        SET CURITEM=%%~1.HEAD%text.NL%
+        SET INDEX=-1%text.NL%
+        FOR /L %%O in (0,1,!%%~1.LEN!) DO (%text.NL%
+            IF !INDEX!==-1 (%text.NL%
+                IF !CURITEM! NEQ NONE (%text.NL%
+                    FOR %%C IN (!CURITEM!) DO SET CURITEM=!%%C.NEXT!%text.NL%
+                    FOR %%C IN (!CURITEM!) DO IF "!%%C.VALUE!"=="%%~2" SET INDEX=%%O%text.NL%
+                )%text.NL%
+            )%text.NL%
+        )%text.NL%
+        FOR %%I IN (!INDEX!) DO ENDLOCAL^&SET %%~3=%%I%text.NL%
+    ) %text.NL%
+) ELSE SETLOCAL enableDelayedExpansion ^& SET argv=,
+
+SET @list.Swap=FOR %%n IN (1 2) DO IF %%n==2 (%text.NL%
+    FOR /F "tokens=1,2,3 delims=, " %%1 IN ("!argv!") DO (%text.NL%
+        SET CURITEM=%%~1.HEAD%text.NL%
+        SET ITEM1=-1%text.NL%
+        SET ITEM2=-1%text.NL%
+        FOR /L %%O in (0,1,!%%~1.LEN!) DO (%text.NL%
+            IF !CURITEM! NEQ NONE (%text.NL%
+                FOR %%C IN (!CURITEM!) DO SET CURITEM=!%%C.NEXT!%text.NL%
+                FOR %%C IN (!CURITEM!) DO (%text.NL%
+                    IF !ITEM1!==-1 IF "!%%C.VALUE!"=="%%~2" SET ITEM1=%%C%text.NL%
+                    IF !ITEM2!==-1 IF "!%%C.VALUE!"=="%%~3" SET ITEM2=%%C%text.NL%
+                )%text.NL%
+            )%text.NL%
+        )%text.NL%
+        FOR %%I IN (!ITEM1!) DO FOR %%J IN (!ITEM2!) DO FOR %%A IN (!%%I.VALUE!) DO FOR %%B IN (!%%J.VALUE!) DO ENDLOCAL^&(%text.NL%
+            SET %%I.VALUE=%%B%text.NL%
+            SET %%J.VALUE=%%A%text.NL%
+        )%text.NL%
+    )%text.NL%
+) ELSE SETLOCAL enableDelayedExpansion ^& SET argv=,
 EXIT /b
 
 :New <out_list>
@@ -138,7 +174,6 @@ FOR /L %%N in (0,1,!%~1.LEN!) DO (
     )
 )
 ENDLOCAL & SET %~3=%INDEX%
-)
 
 EXIT /b
 
