@@ -70,6 +70,11 @@ FOR /L %%R in (0,1,%RENDERER.HEIGHT%) DO (
                 SET /A LEN=!%%S[%%Y].LEN!-!START!
                 IF 0 GTR !LEN! SET LEN=0
                 SET /A AFTER=!BEFORE!+!LEN!
+                IF !AFTER! GTR %RENDERER.WIDTH% (
+                    SET /A LEN=%RENDERER.WIDTH%-!BEFORE!
+                    IF 0 GTR !LEN! SET LEN=0
+                    SET AFTER=%RENDERER.WIDTH%
+                ) ELSE SET LEN=!%%S[%%Y].LEN!
             )
             FOR %%B IN (!BEFORE!) DO FOR %%A IN (!AFTER!) DO FOR %%T IN (!START!) DO FOR %%L IN (!LEN!) DO SET "TEMPROW=!TEMPROW:~0,%%B!!%%S[%%Y]:~%%T,%%L!!!TEMPROW:~%%A!" >> tmp.tmp
         )

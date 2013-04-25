@@ -32,7 +32,7 @@ SET @text.StrLen=FOR %%n IN (1 2) DO IF %%n==2 (%text.NL%
 ) ELSE SETLOCAL enableDelayedExpansion ^& SET argv=,
 
 SET @text.Put=FOR %%n IN (1 2) DO IF %%n==2 (%text.NL%
-      FOR /F "tokens=1 delims=, " %%1 IN ("!argv!") DO (%text.NL%
+      FOR /F "tokens=1 delims=," %%1 IN ("!argv!") DO (%text.NL%
          ^<NUL SET /p ".=%%1"%text.NL%
          ENDLOCAL%text.NL%
       ) %text.NL%
@@ -46,7 +46,7 @@ SET @text.PutCR=FOR %%n IN (1 2) DO IF %%n==2 (%text.NL%
 ) ELSE SETLOCAL enableDelayedExpansion ^& SET argv=,
 
 SET @text.SuperPut=FOR %%n IN (1 2) DO IF %%n==2 (%text.NL%
-      FOR /F "tokens=1 delims=, " %%1 IN ("!argv!") DO (%text.NL%
+      FOR /F "tokens=1 delims=," %%1 IN ("!argv!") DO (%text.NL%
          ^> txt.tmp (ECHO(%%~1!text.SUB!)%text.NL%
          COPY txt.tmp /a txt2.tmp /b ^> NUL%text.NL%
          TYPE txt2.tmp%text.NL%
