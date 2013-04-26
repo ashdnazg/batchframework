@@ -10,11 +10,12 @@ SET RENDERER=1
 SET RENDERER.HEIGHT=22
 SET RENDERER.WIDTH=50
 SET "RENDERER.BLANKROW=                                                  "
+%@list.New% RENDERER.ANIMATEDOBJECTS
 EXIT /b
 
 :Sprite <out_sprite> <file>
 SET %~1.ROWS=0
-FOR /F "delims=" %%A in (%~2)  DO (
+FOR /F "delims=" %%A IN (%~2)  DO (
     CALL SET "%~1[%%%~1.ROWS%%]=%%A"
     CALL :SpriteRow %~1[%%%~1.ROWS%%] "%%A"
     CALL SET /A %~1.ROWS=%%%~1.ROWS%%+1
@@ -38,20 +39,74 @@ EXIT /b
 
 :Object <out_object> <sprite> <row> <col>
 SET %~1.SPRITE=%~2
+SET %~1.ORIGINALSPRITE=%~2
 SET %~1.ROW=%~3
 SET %~1.COL=%~4
 %@list.Add% RENDERER.OBJECTS %~1
 EXIT /b
 
+:Animation <out_animation> <Sprite files...>
+SETLOCAL EnableDelayedExpansion
+
+SET N=-1
+FOR %%S IN (%*) DO (
+    IF !N! NEQ -1 (
+        FOR %%N IN (!N!) DO ENDLOCAL & (
+            CALL :Sprite %1[%%N] %%S
+            SETLOCAL EnableDelayedExpansion
+            SET /A N=%%N+1
+        )
+    ) ELSE SET /A N=!N!+1
+)
+ENDLOCAL & SET /A %~1.LEN=%N%
+EXIT /b
+
+:PlayAnimation <object> <animation>
+SETLOCAL EnableDelayedExpansion
+IF "!%~1.PAUSEDANIMATION!"=="%~2" (
+    ENDLOCAL & SET %~1.ANIMATION=%~2
+) ELSE ENDLOCAL &(
+    SET %~1.ANIMATION=%~2
+    SET %~1.PAUSEDANIMATION=%~2
+    SET %~1.NEXTFRAME=0
+)
+EXIT /b
+
+:PauseAnimation <object>
+SET %~1.ANIMATION=
+EXIT /b
+
+:StopAnimation
+SETLOCAL EnableDelayedExpansion 
+FOR %%S IN (!%~1.ORIGINALSPRITE!) DO ENDLOCAL &(
+    SET %~1.ANIMATION=
+    SET %~1.PAUSEDANIMATION=
+    SET %~1.SPRITE=%%S
+)
+EXIT /b
+
+:Animate <objects>
+SETLOCAL EnableDelayedExpansion
+FOR %%O IN (!%~1!) DO IF "!%%O.ANIMATION!" NEQ "" FOR %%A IN (!%%O.ANIMATION!) DO FOR %%N IN (!%%O.NEXTFRAME!) DO FOR %%L IN (!%%A.LEN!) DO ENDLOCAL &(
+    SET %%O.SPRITE=%%A[%%N]
+    SET /A %%O.NEXTFRAME+=1
+    SET /A %%O.NEXTFRAME%%=%%L
+    SETLOCAL EnableDelayedExpansion
+)
+ENDLOCAL
+EXIT /b
+    
+    
+
 :Render <objects> <start_line> <end_line>
 SETLOCAL EnableDelayedExpansion
-FOR /L %%R in (%~2,1,%~3) DO (
+FOR /L %%R IN (%~2,1,%~3) DO (
     SET "TEMPROW=%RENDERER.BLANKROW%
-    FOR %%O in (!%1!) DO (
+    FOR %%O IN (!%~1!) DO (
         SET /A Y=%%R - !%%O.ROW!
         SET SPRITE=!%%O.SPRITE!
-        FOR %%S in (!SPRITE!) DO (SET SPRITEROWS=!%%S.ROWS!)
-        IF !Y! GEQ 0 IF !SPRITEROWS! GTR !Y! FOR %%S in (!SPRITE!) DO FOR %%Y in (!Y!) DO (
+        FOR %%S IN (!SPRITE!) DO (SET SPRITEROWS=!%%S.ROWS!)
+        IF !Y! GEQ 0 IF !SPRITEROWS! GTR !Y! FOR %%S IN (!SPRITE!) DO FOR %%Y IN (!Y!) DO (
             SET /A BEFORE=!%%S[%%Y].START! + !%%O.COL!
             IF !BEFORE! GEQ 0 (
                 SET START=0

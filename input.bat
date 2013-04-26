@@ -2,7 +2,7 @@
 :Start
 CHOICE /C WASDQE > NUL 2>&1
 IF %ERRORLEVEL%==5 (
-    ECHO 1 >stop.tmp
+    DEL running.tmp > NUL 2>&1
     EXIT /b
 )
 IF %ERRORLEVEL%==6 ECHO.
