@@ -1,12 +1,10 @@
 @ECHO off
-CALL INCLUDE time
+CALL INCLUDE timeops
 :Start
-CLS
-TYPE page1.txt
-::CALL ECHO %BUF2%
-%time.Wait% 1
-CLS
-TYPE page2.txt
-::CALL ECHO %BUF1%
-%time.Wait% 1
-GOTO :Start
+IF EXIST lock.tmp (
+    CLS
+    TYPE display.tmp
+    DEL lock.tmp > NUL 2>&1
+)
+REM %timeops.Wait% 8
+IF NOT EXIST stop.tmp GOTO :Start

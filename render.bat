@@ -36,18 +36,16 @@ SET /A %~1.LEN=%LENSTRIPPED%
 )
 EXIT /b
 
-:Object <out_object> <sprite> <height> <width> <row> <col>
+:Object <out_object> <sprite> <row> <col>
 SET %~1.SPRITE=%~2
-SET %~1.HEIGHT=%~3
-SET %~1.WIDTH=%~4
-SET %~1.ROW=%~5
-SET %~1.COL=%~6
+SET %~1.ROW=%~3
+SET %~1.COL=%~4
 %@list.Add% RENDERER.OBJECTS %~1
 EXIT /b
 
-:Render <objects>
+:Render <objects> <start_line> <end_line>
 SETLOCAL EnableDelayedExpansion
-FOR /L %%R in (0,1,%RENDERER.HEIGHT%) DO (
+FOR /L %%R in (%~2,1,%~3) DO (
     SET "TEMPROW=%RENDERER.BLANKROW%
     FOR %%O in (!%1!) DO (
         SET /A Y=%%R - !%%O.ROW!
@@ -78,7 +76,7 @@ FOR /L %%R in (0,1,%RENDERER.HEIGHT%) DO (
             FOR %%B IN (!BEFORE!) DO FOR %%A IN (!AFTER!) DO FOR %%T IN (!START!) DO FOR %%L IN (!LEN!) DO SET "TEMPROW=!TEMPROW:~0,%%B!!%%S[%%Y]:~%%T,%%L!!!TEMPROW:~%%A!"
         )
     )
-    ECHO.!TEMPROW!
+    ECHO,!TEMPROW!
 )
 ENDLOCAL
 EXIT /b

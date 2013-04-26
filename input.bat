@@ -1,6 +1,10 @@
 @ECHO off
 :Start
-CHOICE /C WASDQ > NUL
+CHOICE /C WASDQE > NUL 2>&1
+IF %ERRORLEVEL%==5 (
+    ECHO 1 >stop.tmp
+    EXIT /b
+)
+IF %ERRORLEVEL%==6 ECHO.
 (ECHO %ERRORLEVEL%) >input.tmp
-IF %ERRORLEVEL%==5 EXIT /b
 GOTO :Start
